@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>trickle</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+<div id='container'></div>
+<button onClick='javascript: playPlayer()'>Play</button>
+<button onClick='javascript: pausePlayer()'>Pause</button>
+
+<script src='https://unpkg.com/react-player/dist/ReactPlayer.standalone.js'></script>
+<script>
+  const container = document.getElementById('container')
+  const url = 'https://www.youtube.com/watch?v=d46Azg3Pm4c'
+
+  renderReactPlayer(container, { url, playing: true })
+
+  function pausePlayer () {
+    renderReactPlayer(container, { url, playing: false })
+  }
+</script>
+</body>
+</html>
