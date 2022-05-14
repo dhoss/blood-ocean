@@ -1,11 +1,15 @@
 package in.stonecolddev.trickle.video;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 import org.springframework.util.MimeType;
 
 import java.time.OffsetDateTime;
 
 @Value.Immutable
+@JsonSerialize(as = ImmutableVideo.class)
+@JsonDeserialize(as = ImmutableVideo.class)
 public abstract class Video {
     public abstract int id();
     public abstract String fileName();

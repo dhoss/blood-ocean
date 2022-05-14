@@ -4,3 +4,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/trickle
     username: trickle
     password: trickle
+logging:
+  level:
+    root: "warn"
+    org.springframework.web: "debug"
+    in.stonecolddev.trickle: "debug"
