@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "esbuild": "^0.14.39",
+    "react-player": "^2.10.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.0.24"
+  }
+}
