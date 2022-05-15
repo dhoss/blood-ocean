@@ -8,22 +8,7 @@
 </head>
 
 <body>
-<div class="grid place-items-center h-screen">
-    <div id='container'></div>
-    <button onClick='javascript: playPlayer()'>Play</button>
-    <button onClick='javascript: pausePlayer()'>Pause</button>
-</div>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-player@2.10.1/lib/index.min.js"></script>
-<script type="text/babel">
-import React from 'react'
-import ReactPlayer from 'react-player'
-ReactDOM.render(
-  <ReactPlayer url='https://trickle-media.sfo3.digitaloceanspaces.com/fixed-trimmed-end-sample.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=HFR3ZTLLWMR43DB54UYV%2F20220515%2Fsfo3%2Fs3%2Faws4_request&X-Amz-Date=20220515T194720Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=ed87709b2906a9e7c41b4c20e37a71bad1c2546dae1d45e35fbfb3fcf38840d1' />,
-  document.getElementById('container')
-);
-</script>
+  <div id="app" class="grid place-items-center h-screen"></div>
+  <script src="app.js"></script>
 </body>
 </html>
