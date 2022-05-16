@@ -4,6 +4,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/trickle
     username: trickle
     password: trickle
+    mvc:
+      static-path-pattern=/static/**:
 logging:
   level:
     root: "warn"
