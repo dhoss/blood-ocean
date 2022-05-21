@@ -3,8 +3,10 @@ package in.stonecolddev.trickle.video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -31,7 +33,17 @@ public class VideoController {
     }
 
     @GetMapping("/{path}")
-    public String find(@PathVariable String path) {
-        return path;
+    public Video find(@PathVariable String path) {
+        return ImmutableVideo.builder()
+                .id(1)
+                .fileName("fart")
+                .fileNameHash("frrrrt")
+                .description("foart!")
+                .fileSize(1)
+                .mimeType(MimeType.valueOf("video/mp4"))
+                .path(path)
+                .createdOn(OffsetDateTime.now())
+                .updatedOn(OffsetDateTime.now())
+                .build();
     }
 }
