@@ -1,8 +1,6 @@
 import './App.css';
 import 'video-react/dist/video-react.css';
-import React, { Component } from 'react';
-import ReactDOM from "react-dom";
-import { useState } from "react";
+import React from 'react';
 import Async from "react-async";
 import { Player } from 'video-react';
 
