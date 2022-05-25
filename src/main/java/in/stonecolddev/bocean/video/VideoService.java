@@ -1,4 +1,4 @@
-package in.stonecolddev.trickle.video;
+package in.stonecolddev.bocean.video;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;

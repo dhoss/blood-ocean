@@ -1,1 +1,1 @@
-cd ~/projects/trickle/src/main/resources/static/trickle/ && npm run build && cd ~/projects/trickle/ && mvn clean spring-boot:run
+cd ~/projects/bocean/src/main/resources/static/bocean/ && npm run build && cd ~/projects/bocean/ && mvn clean spring-boot:run

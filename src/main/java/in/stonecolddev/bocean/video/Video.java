@@ -1,4 +1,4 @@
-package in.stonecolddev.trickle.video;
+package in.stonecolddev.bocean.video;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

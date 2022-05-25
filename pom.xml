@@ -8,10 +8,10 @@
 		<version>2.6.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>in.stonecolddev</groupId>
-	<artifactId>trickle</artifactId>
+	<groupId>in.stonecolddev.bocean</groupId>
+	<artifactId>bocean</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>trickle</name>
+	<name>blood-ocean</name>
 	<description>a very small video streaming server</description>
 	<properties>
 		<java.version>18</java.version>
@@ -133,7 +133,7 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
-					<exclude>static/trickle/node_modules/**</exclude>
+					<exclude>static/bocean/node_modules/**</exclude>
 				</excludes>
 			</resource>
 		</resources>

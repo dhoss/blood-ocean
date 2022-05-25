@@ -1,10 +1,10 @@
-package in.stonecolddev.trickle;
+package in.stonecolddev.bocean;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TrickleApplicationTests {
+class BOceanApplicationTests {
 
 	@Test
 	void contextLoads() {

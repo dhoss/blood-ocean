@@ -25,4 +25,4 @@ src/main/resources/static/static/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-src/main/resources/static/trickle/build/
+src/main/resources/static/bocean/build/

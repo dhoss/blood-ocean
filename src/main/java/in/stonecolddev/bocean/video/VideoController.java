@@ -1,4 +1,4 @@
-package in.stonecolddev.trickle.video;
+package in.stonecolddev.bocean.video;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

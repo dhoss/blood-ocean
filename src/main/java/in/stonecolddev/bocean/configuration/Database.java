@@ -1,7 +1,7 @@
-package in.stonecolddev.trickle.configuration;
+package in.stonecolddev.bocean.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
-import in.stonecolddev.trickle.repository.Repository;
+import in.stonecolddev.bocean.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
