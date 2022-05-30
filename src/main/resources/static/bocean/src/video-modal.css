@@ -2,3 +2,7 @@
   max-width: 2000px;
   width: 100%;
 }
+
+.video-modal-button {
+  cursor: pointer;
+}

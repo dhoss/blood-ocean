@@ -23,6 +23,6 @@ public abstract class Video {
 
     @Value.Derived
     public String thumbnail() {
-        return "%s_thumbnail".formatted(this.path());
+        return "%s_thumbnail.jpg".formatted(this.path());
     }
 }

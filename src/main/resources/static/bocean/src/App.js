@@ -27,7 +27,11 @@ const App = () => {
   if (data)
     return (
       <div className='grid place-items-center h-screen'>
-          <button onClick={onOpenModal}>Open modal</button>
+          <img
+            className='video-modal-button'
+            onClick={onOpenModal}
+            src={`https://trickle-media.sfo3.cdn.digitaloceanspaces.com/${data.thumbnail}?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=HFR3ZTLLWMR43DB54UYV%2F20220530%2Fsfo3%2Fs3%2Faws4_request&X-Amz-Date=20220530T221530Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e54de283601e8cd573b798288715640bc17945199710b579bfd61d93acac290a`}
+          />
           <Modal 
             open={open} 
             onClose={onCloseModal} 
