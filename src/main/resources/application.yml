@@ -1,13 +1,20 @@
 spring:
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/trickle
-    username: trickle
-    password: trickle
+    url: jdbc:postgresql://localhost:5432/bocean
+    username: bocean
+    password: bocean
     mvc:
       static-path-pattern=/static/**:
 logging:
   level:
     root: "warn"
     org.springframework.web: "debug"
-    in.stonecolddev.trickle: "debug"
+    in.stonecolddev.bocean: "debug"
+video:
+  store:
+    endpoint: https://trickle-media.sfo3.cdn.digitaloceanspaces.com
+    region: sfo3
+    credentials:
+      accessKeyId: ${BLOOD_OCEAN_SPACES_KEY_ID}
+      secretAccessKey: ${BLOOD_OCEAN_SPACES_SECRET}
