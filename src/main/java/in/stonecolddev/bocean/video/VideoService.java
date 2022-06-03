@@ -14,17 +14,44 @@ public class VideoService {
 
     public List<Video> retrieve(int page, int pageSize) {
 
-        return List.of(ImmutableVideo.builder()
-                .id(1)
-                .fileName("dark-souls.mp4")
-                .fileNameHash("dark-souls-hash")
-                .path("/path/to/dark-souls-hash")
-                .description("dark-souls")
-                .fileSize(1024)
-                .mimeType(MimeType.valueOf("video/mp4"))
-                .createdOn(OffsetDateTime.now())
-                .updatedOn(OffsetDateTime.now())
-                .build());
+        return List.of(
+
+                ImmutableVideo.builder()
+                        .id(1)
+                        .fileName("fixed-trimmed-end-sample.mp4")
+                        .fileNameHash("dark-souls-hash")
+                        .path("fixed-trimmed-end-sample.mp4")
+                        .description("dark-souls")
+                        .fileSize(1024)
+                        .mimeType(MimeType.valueOf("video/mp4"))
+                        .createdOn(OffsetDateTime.now())
+                        .updatedOn(OffsetDateTime.now())
+                        .build(),
+
+                ImmutableVideo.builder()
+                        .id(1)
+                        .fileName("fixed-trimmed-end-sample.mp4")
+                        .fileNameHash("dark-souls-hash")
+                        .path("fixed-trimmed-end-sample.mp4")
+                        .description("dark-souls")
+                        .fileSize(1024)
+                        .mimeType(MimeType.valueOf("video/mp4"))
+                        .createdOn(OffsetDateTime.now())
+                        .updatedOn(OffsetDateTime.now())
+                        .build(),
+
+                ImmutableVideo.builder()
+                        .id(1)
+                        .fileName("fixed-trimmed-end-sample.mp4")
+                        .fileNameHash("dark-souls-hash")
+                        .path("fixed-trimmed-end-sample.mp4")
+                        .description("dark-souls")
+                        .fileSize(1024)
+                        .mimeType(MimeType.valueOf("video/mp4"))
+                        .createdOn(OffsetDateTime.now())
+                        .updatedOn(OffsetDateTime.now())
+                        .build()
+        );
     }
 
 }
