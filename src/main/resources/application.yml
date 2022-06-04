@@ -1,20 +1,18 @@
 spring:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bocean
-    username: bocean
-    password: bocean
+  profiles:
+    active: local
     mvc:
-      static-path-pattern=/static/**:
+      static-path-pattern: "/static/**"
 logging:
   level:
     root: "warn"
     org.springframework.web: "debug"
     in.stonecolddev.bocean: "debug"
-video:
-  store:
-    endpoint: https://trickle-media.sfo3.cdn.digitaloceanspaces.com
-    region: sfo3
+cloud:
+  aws:
     credentials:
-      accessKeyId: ${BLOOD_OCEAN_SPACES_KEY_ID}
-      secretAccessKey: ${BLOOD_OCEAN_SPACES_SECRET}
+      access-key: ${BLOOD_OCEAN_SPACES_KEY_ID}
+      secret-key: ${BLOOD_OCEAN_SPACES_SECRET}
+    region: sfo3
+    s3:
+      endpoint: https://trickle-media.sfo3.cdn.digitaloceanspaces.com

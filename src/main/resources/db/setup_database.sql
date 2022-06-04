@@ -1,3 +1,4 @@
+-- TODO: rename these to bocean
 create database trickle;
 
 create user trickle with password 'trickle';
