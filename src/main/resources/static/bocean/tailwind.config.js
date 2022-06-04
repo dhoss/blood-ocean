@@ -4,7 +4,11 @@ module.exports = {
     "./src/**/*"
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'blood-ocean': "url('./blood-ocean.jpg')",
+      },
+    },
   },
   plugins: [],
 }

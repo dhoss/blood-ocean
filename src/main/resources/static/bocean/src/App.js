@@ -30,7 +30,8 @@ const App = () => {
 
   if (data)
     return (
-      <div className='grid place-items-center h-screen'>
+      <div className={"bg-cover bg-blood-ocean"}>
+      <div className="grid place-items-center h-screen">
         <section class="overflow-hidden text-gray-700 ">
           <div class="container px-5 py-2 mx-auto lg:pt-12 lg:px-32">
             <div class="flex flex-wrap -m-1 md:-m-2">
@@ -41,6 +42,7 @@ const App = () => {
                     className='video-modal-button'
                     onClick={() => onOpenModal(video)}
                     src={`https://trickle-media.sfo3.cdn.digitaloceanspaces.com/${video.thumbnail}?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=HFR3ZTLLWMR43DB54UYV%2F20220603%2Fsfo3%2Fs3%2Faws4_request&X-Amz-Date=20220603T214059Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=1254bcafecd85550d874dc7a9b42145d386ca535dc604d34ab1525018c744496`}
+                    alt=""
                   />
                 </div>
               </div>
@@ -64,6 +66,7 @@ const App = () => {
                   height="100%"
               />
           </Modal>
+      </div>
       </div>
     );
   return null;
