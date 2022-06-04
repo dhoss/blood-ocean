@@ -1,6 +1,7 @@
 package in.stonecolddev.bocean.video;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 
@@ -21,6 +22,11 @@ public class VideoService {
     // TODO: mark and sweep resized images (https://www.educative.io/courses/a-quick-primer-on-garbage-collection-algorithms/jy6v)
 
     public List<Video> retrieve(int page, int pageSize) {
+        ListObjectsV2Result result = s3Client.listObjectsV2("trickle-media");
+        List<S3ObjectSummary> objects = result.getObjectSummaries();
+        for (S3ObjectSummary os : objects) {
+            System.out.println("* " + os.getKey());
+        }
 
         return List.of(
 

@@ -8,11 +8,3 @@ logging:
     root: "warn"
     org.springframework.web: "debug"
     in.stonecolddev.bocean: "debug"
-cloud:
-  aws:
-    credentials:
-      access-key: ${BLOOD_OCEAN_SPACES_KEY_ID}
-      secret-key: ${BLOOD_OCEAN_SPACES_SECRET}
-    region: sfo3
-    s3:
-      endpoint: https://trickle-media.sfo3.cdn.digitaloceanspaces.com

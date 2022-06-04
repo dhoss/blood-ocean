@@ -11,3 +11,11 @@ spring:
       pool-name: bocean-pool
       username: trickle
       password: trickle
+cloud:
+  aws:
+    credentials:
+      access-key: ${BLOOD_OCEAN_SPACES_KEY_ID}
+      secret-key: ${BLOOD_OCEAN_SPACES_SECRET}
+    region: sfo3
+    s3:
+      endpoint: https://sfo3.digitaloceanspaces.com
