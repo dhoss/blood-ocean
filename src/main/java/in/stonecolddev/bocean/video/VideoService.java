@@ -1,11 +1,9 @@
 package in.stonecolddev.bocean.video;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 
