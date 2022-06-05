@@ -28,12 +28,11 @@ public class VideoService {
     // TODO: directory hashing (https://medium.com/eonian-technologies/file-name-hashing-creating-a-hashed-directory-structure-eabb03aa4091)
     // TODO: mark and sweep resized images (https://www.educative.io/courses/a-quick-primer-on-garbage-collection-algorithms/jy6v)
 
-    // TODO get me from config
-    private final String bucketName = "trickle-media";
-
     public List<Video> retrieve(int page, int pageSize) {
         var videos = new ArrayList<Video>();
 
+        // TODO get me from config
+        String bucketName = "trickle-media";
         for (var os : s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).contents()) {
             if (!os.key().contains("thumbnail")) {
                 videos.add(
