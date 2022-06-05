@@ -1,71 +1,65 @@
 package in.stonecolddev.bocean.video;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class VideoService {
 
+    private final S3Client s3Client;
 
-    private final AmazonS3 s3Client;
+    private final S3Presigner s3Presigner;
 
-    public VideoService(AmazonS3 s3Client) {
+    public VideoService(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
     }
 
     // TODO: directory hashing (https://medium.com/eonian-technologies/file-name-hashing-creating-a-hashed-directory-structure-eabb03aa4091)
     // TODO: mark and sweep resized images (https://www.educative.io/courses/a-quick-primer-on-garbage-collection-algorithms/jy6v)
 
+    // TODO get me from config
+    private final String bucketName = "trickle-media";
+
     public List<Video> retrieve(int page, int pageSize) {
-        ListObjectsV2Result result = s3Client.listObjectsV2("trickle-media");
-        List<S3ObjectSummary> objects = result.getObjectSummaries();
-        for (S3ObjectSummary os : objects) {
-            System.out.println("* " + os.getKey());
+        var videos = new ArrayList<Video>();
+
+        for (var os : s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).contents()) {
+            if (!os.key().contains("thumbnail")) {
+                videos.add(
+                        ImmutableVideo.builder()
+                                .id(1)
+                                .fileName("fixed-trimmed-end-sample.mp4")
+                                .fileNameHash("dark-souls-hash")
+                                .path("fixed-trimmed-end-sample.mp4")
+                                .url(s3Presigner.presignGetObject(GetObjectPresignRequest.builder()
+                                        .signatureDuration(Duration.ofMinutes(10))
+                                        .getObjectRequest(GetObjectRequest.builder().key(os.key()).bucket(bucketName).build())
+                                        .build()).url())
+                                .thumbnailUrl(s3Presigner.presignGetObject(GetObjectPresignRequest.builder()
+                                        .signatureDuration(Duration.ofMinutes(10))
+                                        .getObjectRequest(GetObjectRequest.builder().key(String.format("%s_thumbnail.jpg", os.key())).bucket(bucketName).build())
+                                        .build()).url())
+                                .description("dark-souls")
+                                .fileSize(1024)
+                                .mimeType(MimeType.valueOf("video/mp4"))
+                                .createdOn(OffsetDateTime.now())
+                                .updatedOn(OffsetDateTime.now())
+                                .build()
+                );
+            }
         }
 
-        return List.of(
-
-                ImmutableVideo.builder()
-                        .id(1)
-                        .fileName("fixed-trimmed-end-sample.mp4")
-                        .fileNameHash("dark-souls-hash")
-                        .path("fixed-trimmed-end-sample.mp4")
-                        .description("dark-souls")
-                        .fileSize(1024)
-                        .mimeType(MimeType.valueOf("video/mp4"))
-                        .createdOn(OffsetDateTime.now())
-                        .updatedOn(OffsetDateTime.now())
-                        .build(),
-
-                ImmutableVideo.builder()
-                        .id(1)
-                        .fileName("fixed-trimmed-end-sample.mp4")
-                        .fileNameHash("dark-souls-hash")
-                        .path("fixed-trimmed-end-sample.mp4")
-                        .description("dark-souls")
-                        .fileSize(1024)
-                        .mimeType(MimeType.valueOf("video/mp4"))
-                        .createdOn(OffsetDateTime.now())
-                        .updatedOn(OffsetDateTime.now())
-                        .build(),
-
-                ImmutableVideo.builder()
-                        .id(1)
-                        .fileName("fixed-trimmed-end-sample.mp4")
-                        .fileNameHash("dark-souls-hash")
-                        .path("fixed-trimmed-end-sample.mp4")
-                        .description("dark-souls")
-                        .fileSize(1024)
-                        .mimeType(MimeType.valueOf("video/mp4"))
-                        .createdOn(OffsetDateTime.now())
-                        .updatedOn(OffsetDateTime.now())
-                        .build()
-        );
+        return videos;
     }
-
 }
