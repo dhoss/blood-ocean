@@ -27,6 +27,9 @@ public class Aws {
     @Value("${cloud.aws.s3.endpoint}")
     private String endpoint;
 
+    @Value("${cloud.aws.s3.signature-duration}")
+    public String signatureDurationMinutes;
+
     private AwsCredentialsProvider awsCredentialsProvider() {
         return StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(this.accessKey, this.secretKey)

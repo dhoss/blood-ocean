@@ -39,7 +39,7 @@ const App = () => {
                 <div class="flex flex-wrap w-full">
                   <div class="w-full p-1 md:p-2">
                     <img
-                      className='video-modal-button block object-cover object-center w-full h-full rounded-lg'
+                      className="video-modal-button block object-cover object-center w-full h-full"
                       onClick={() => onOpenModal(video)}
                       width="100%"
                       height="100%"

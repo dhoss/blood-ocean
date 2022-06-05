@@ -1,5 +1,6 @@
 package in.stonecolddev.bocean.video;
 
+import in.stonecolddev.bocean.configuration.Aws;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -20,9 +21,13 @@ public class VideoService {
 
     private final S3Presigner s3Presigner;
 
-    public VideoService(S3Client s3Client, S3Presigner s3Presigner) {
+    // TODO: rename me
+    private final Aws awsConfig;
+
+    public VideoService(S3Client s3Client, S3Presigner s3Presigner, Aws awsConfig) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
+        this.awsConfig = awsConfig;
     }
 
     // TODO: directory hashing (https://medium.com/eonian-technologies/file-name-hashing-creating-a-hashed-directory-structure-eabb03aa4091)
@@ -40,17 +45,17 @@ public class VideoService {
                                 .id(1)
                                 .fileName("fixed-trimmed-end-sample.mp4")
                                 .fileNameHash("dark-souls-hash")
-                                .path("fixed-trimmed-end-sample.mp4")
+                                .path(os.key())
                                 .url(s3Presigner.presignGetObject(GetObjectPresignRequest.builder()
                                         .signatureDuration(Duration.ofMinutes(10))
                                         .getObjectRequest(GetObjectRequest.builder().key(os.key()).bucket(bucketName).build())
                                         .build()).url())
                                 .thumbnailUrl(s3Presigner.presignGetObject(GetObjectPresignRequest.builder()
-                                        .signatureDuration(Duration.ofMinutes(10))
+                                        .signatureDuration(Duration.ofMinutes(Integer.parseInt(awsConfig.signatureDurationMinutes)))
                                         .getObjectRequest(GetObjectRequest.builder().key(String.format("%s_thumbnail.jpg", os.key())).bucket(bucketName).build())
                                         .build()).url())
                                 .description("dark-souls")
-                                .fileSize(1024)
+                                .fileSize(Math.toIntExact(os.size()))
                                 .mimeType(MimeType.valueOf("video/mp4"))
                                 .createdOn(OffsetDateTime.now())
                                 .updatedOn(OffsetDateTime.now())
