@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface VideoRepository {
 
-    public List<ImmutableVideo> retrieve(int lastSeen, int pageSize);
+    List<ImmutableVideo> retrieve(int lastSeen, int pageSize);
 }
