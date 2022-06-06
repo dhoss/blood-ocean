@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -23,7 +25,12 @@ public class VideoController {
         this.videoService = videoService;
     }
 
-    @GetMapping("")
+    @PostMapping
+    public Integer uploadToS3(@RequestParam("video") MultipartFile video) throws IOException {
+        return videoService.upload(video);
+    }
+
+    @GetMapping
     public List<Video> list(
             @RequestParam(defaultValue = "0") int lastSeen,
             @RequestParam(defaultValue = "50") int pageSize) {

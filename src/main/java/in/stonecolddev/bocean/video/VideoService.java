@@ -2,11 +2,18 @@ package in.stonecolddev.bocean.video;
 
 import in.stonecolddev.bocean.configuration.AwsConfig;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +47,31 @@ public class VideoService {
         }
 
         return videos;
+    }
+
+    public Integer upload(MultipartFile video) throws IOException {
+
+        HttpURLConnection connection =
+            (HttpURLConnection) s3Presigner.presignPutObject(
+                PutObjectPresignRequest.builder().putObjectRequest(
+                    PutObjectRequest.builder()
+                                    .bucket("trickle-media")
+                                    .key(video.getOriginalFilename())
+                                    .contentType("video/mp4")
+                                    .build())
+                                       .signatureDuration(Duration.ofMinutes(10))
+                                       .build())
+                                           .url()
+                                           .openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "video/mp4");
+        connection.setRequestMethod("PUT");
+        ByteArrayOutputStream out = (ByteArrayOutputStream) connection.getOutputStream();
+        out.write(video.getBytes());
+        out.close();
+
+        return connection.getResponseCode();
+
     }
 
     private URL generatePresignedUrl(String path) {

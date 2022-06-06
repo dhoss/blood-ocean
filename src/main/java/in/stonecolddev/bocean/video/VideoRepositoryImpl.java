@@ -60,4 +60,8 @@ public class VideoRepositoryImpl implements VideoRepository {
                 rowMapper
         );
     }
+
+    public void create(ImmutableVideo video) {
+
+    }
 }
