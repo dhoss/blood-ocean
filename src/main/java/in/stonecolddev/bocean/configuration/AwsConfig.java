@@ -11,9 +11,10 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
+import java.time.Duration;
 
 @Configuration
-public class Aws {
+public class AwsConfig {
 
     @Value("${cloud.aws.credentials.access-key}")
     private String accessKey;
@@ -28,7 +29,10 @@ public class Aws {
     private String endpoint;
 
     @Value("${cloud.aws.s3.signature-duration}")
-    public String signatureDurationMinutes;
+    public Duration signatureDurationMinutes;
+
+    @Value("${cloud.aws.s3.video-bucket}")
+    public String videoBucket;
 
     private AwsCredentialsProvider awsCredentialsProvider() {
         return StaticCredentialsProvider.create(

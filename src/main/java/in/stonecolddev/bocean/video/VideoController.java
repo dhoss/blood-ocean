@@ -26,10 +26,10 @@ public class VideoController {
 
     @GetMapping("")
     public List<Video> list(
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int lastSeen,
             @RequestParam(defaultValue = "50") int pageSize) {
         log.debug("*** INSIDE LIST");
-        return this.videoService.retrieve(page, pageSize);
+        return this.videoService.retrieve(lastSeen, pageSize);
     }
 
     @GetMapping("/{path}")

@@ -9,3 +9,5 @@ create table videos(
   created_on timestamptz not null default now(),
   updated_on timestamptz not null default now()
 );
+
+create index videos_created_on_idx on videos(created_on);

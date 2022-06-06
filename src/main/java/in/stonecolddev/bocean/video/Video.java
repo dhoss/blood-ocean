@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 import org.springframework.util.MimeType;
 
+import javax.annotation.Nullable;
 import java.net.URL;
 import java.time.OffsetDateTime;
 
@@ -16,7 +17,11 @@ public abstract class Video {
     public abstract String fileName();
     public abstract String fileNameHash();
     public abstract String path();
+
+    @Nullable
     public abstract URL url();
+
+    @Nullable
     public abstract URL thumbnailUrl();
     public abstract String description();
     public abstract int fileSize();

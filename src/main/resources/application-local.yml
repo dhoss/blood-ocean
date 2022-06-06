@@ -19,4 +19,5 @@ cloud:
     region: sfo3
     s3:
       endpoint: https://sfo3.digitaloceanspaces.com
-      signature-duration: 10 # minutes
+      signature-duration: 10m # minutes
+      video-bucket: trickle-media
