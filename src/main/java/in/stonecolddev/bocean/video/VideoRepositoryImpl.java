@@ -42,7 +42,7 @@ public class VideoRepositoryImpl implements VideoRepository {
                 JdbcTemplateMapperFactory
                         .newInstance().newSqlParameterSourceFactory(ImmutableVideo.class);
 
-        this.jdbcTemplate = namedParameterJdbcDaoSupport.getNamedParameterJdbcTemplate();
+        this.jdbcTemplate = this.namedParameterJdbcDaoSupport.getNamedParameterJdbcTemplate();
 
     }
 

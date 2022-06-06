@@ -17,7 +17,6 @@ public class VideoController {
 
     private final Logger log = LoggerFactory.getLogger(VideoController.class);
 
-
     private final VideoService videoService;
 
     public VideoController(VideoService videoService) {
@@ -28,7 +27,7 @@ public class VideoController {
     public List<Video> list(
             @RequestParam(defaultValue = "0") int lastSeen,
             @RequestParam(defaultValue = "50") int pageSize) {
-        log.debug("*** INSIDE LIST");
+
         return this.videoService.retrieve(lastSeen, pageSize);
     }
 
