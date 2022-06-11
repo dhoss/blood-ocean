@@ -26,7 +26,7 @@ public class VideoController {
     }
 
     @PostMapping
-    public Integer uploadToS3(@RequestParam("video") MultipartFile video) throws IOException {
+    public Video upload(@RequestParam("video") MultipartFile video) throws IOException {
         return videoService.upload(video);
     }
 

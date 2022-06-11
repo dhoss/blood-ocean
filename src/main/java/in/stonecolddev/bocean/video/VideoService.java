@@ -5,6 +5,7 @@ import in.stonecolddev.bocean.configuration.MediaConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -52,11 +53,6 @@ public class VideoService {
     var videos = new ArrayList<Video>();
 
     for (var video : videoRepository.retrieve(lastSeen, pageSize)) {
-      log.debug("**** VIDEO {}", video);
-      var v =
-          video.toBuilder().url(generatePresignedUrl(video.path()))
-               .thumbnailUrl(generatePresignedUrl(video.thumbnail())).build();
-      log.debug("**** VIDEO V {}", v);
       videos.add(
           video.toBuilder().url(generatePresignedUrl(video.path()))
                .thumbnailUrl(generatePresignedUrl(video.thumbnail())).build());
@@ -65,7 +61,8 @@ public class VideoService {
     return videos;
   }
 
-  public Integer upload(MultipartFile video) throws IOException {
+  public Video upload(MultipartFile videoFile) throws IOException {
+    log.debug("**** UPLOADING {}", videoFile);
     var videoMimeType = mediaConfig.videoMimeType.toString();
 
     HttpURLConnection connection =
@@ -73,7 +70,7 @@ public class VideoService {
                                            PutObjectPresignRequest.builder().putObjectRequest(
                                                                       PutObjectRequest.builder()
                                                                                       .bucket(awsConfig.videoBucket)
-                                                                                      .key(video.getOriginalFilename())
+                                                                                      .key(videoFile.getOriginalFilename())
                                                                                       .contentType(videoMimeType)
                                                                                       .build())
                                                                   .signatureDuration(awsConfig.signatureDurationMinutes)
@@ -83,11 +80,24 @@ public class VideoService {
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", videoMimeType);
     connection.setRequestMethod("PUT");
-    ByteArrayOutputStream out = (ByteArrayOutputStream) connection.getOutputStream();
-    out.write(video.getBytes());
+    ByteArrayOutputStream out =
+        (ByteArrayOutputStream) connection.getOutputStream();
+    out.write(videoFile.getBytes());
     out.close();
+    log.debug("**** UPLOAD STATUS rESULT {} {}", connection.getResponseCode(), out.size());
 
-    return connection.getResponseCode();
+    Video video = Video.builder()
+                      .description("test")
+                      .fileSize(out.size())
+                      .fileName(videoFile.getOriginalFilename())
+                      .fileNameHash(videoFile.getName())
+                      .mimeType(mediaConfig.videoMimeType)
+                      .path(videoFile.getOriginalFilename())
+                      .build();
+
+    videoRepository.create(video);
+
+    return video;
 
   }
 

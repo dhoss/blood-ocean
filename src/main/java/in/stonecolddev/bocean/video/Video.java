@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.util.MimeType;
 
 import javax.annotation.Nullable;
@@ -17,8 +16,9 @@ import java.time.OffsetDateTime;
 @JsonSerialize(as = Video.class)
 @JsonDeserialize(builder = Video.Builder.class)
 public abstract class Video {
+  @Nullable
   @JsonProperty
-  public abstract int id();
+  public abstract Integer id();
 
   @JsonProperty
   public abstract String fileName();
@@ -46,9 +46,11 @@ public abstract class Video {
   @JsonProperty
   public abstract MimeType mimeType();
 
+  @Nullable
   @JsonProperty
   public abstract OffsetDateTime createdOn();
 
+  @Nullable
   @JsonProperty
   public abstract OffsetDateTime updatedOn();
 
