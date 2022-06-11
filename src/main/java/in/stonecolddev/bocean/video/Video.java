@@ -1,36 +1,104 @@
 package in.stonecolddev.bocean.video;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.util.MimeType;
 
 import javax.annotation.Nullable;
 import java.net.URL;
 import java.time.OffsetDateTime;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableVideo.class)
-@JsonDeserialize(as = ImmutableVideo.class)
+@AutoValue
+@JsonSerialize(as = Video.class)
+@JsonDeserialize(builder = Video.Builder.class)
 public abstract class Video {
-    public abstract int id();
-    public abstract String fileName();
-    public abstract String fileNameHash();
-    public abstract String path();
+  @JsonProperty
+  public abstract int id();
 
-    @Nullable
-    public abstract URL url();
+  @JsonProperty
+  public abstract String fileName();
 
-    @Nullable
-    public abstract URL thumbnailUrl();
-    public abstract String description();
-    public abstract int fileSize();
-    public abstract MimeType mimeType();
-    public abstract OffsetDateTime createdOn();
-    public abstract OffsetDateTime updatedOn();
+  @JsonProperty
+  public abstract String fileNameHash();
 
-    @Value.Derived
-    public String thumbnail() {
-        return "%s_thumbnail.jpg".formatted(this.path());
-    }
+  @JsonProperty
+  public abstract String path();
+
+  @Nullable
+  @JsonProperty
+  public abstract URL url();
+
+  @Nullable
+  @JsonProperty
+  public abstract URL thumbnailUrl();
+
+  @JsonProperty
+  public abstract String description();
+
+  @JsonProperty
+  public abstract int fileSize();
+
+  @JsonProperty
+  public abstract MimeType mimeType();
+
+  @JsonProperty
+  public abstract OffsetDateTime createdOn();
+
+  @JsonProperty
+  public abstract OffsetDateTime updatedOn();
+
+  public abstract Builder toBuilder();
+
+  @JsonCreator
+  public static Builder builder() {
+    return new AutoValue_Video.Builder();
+  }
+
+  @AutoValue.Builder
+  public abstract static class Builder {
+    @JsonProperty
+    public abstract Builder id(int id);
+
+    @JsonProperty
+    public abstract Builder fileName(String fileName);
+
+    @JsonProperty
+    public abstract Builder fileNameHash(String fileNameHash);
+
+    @JsonProperty
+    public abstract Builder path(String path);
+
+    @JsonProperty
+    public abstract Builder url(URL url);
+
+    @JsonProperty
+    public abstract Builder thumbnailUrl(URL thumbnailUrl);
+
+    @JsonProperty
+    public abstract Builder description(String description);
+
+    @JsonProperty
+    public abstract Builder fileSize(int fileSize);
+
+    @JsonProperty
+    public abstract Builder mimeType(MimeType mimeType);
+
+    @JsonProperty
+    public abstract Builder createdOn(OffsetDateTime createdOn);
+
+    @JsonProperty
+    public abstract Builder updatedOn(OffsetDateTime updatedOn);
+
+    public abstract Video build();
+  }
+
+  @Memoized
+  public String thumbnail() {
+    return "%s_thumbnail.jpg".formatted(this.path());
+  }
 }

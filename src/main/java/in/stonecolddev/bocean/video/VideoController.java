@@ -40,7 +40,8 @@ public class VideoController {
 
     @GetMapping("/{path}")
     public Video find(@PathVariable String path) {
-        return ImmutableVideo.builder()
+        return Video.
+            builder()
                 .id(1)
                 .fileName("fart")
                 .fileNameHash("frrrrt")

@@ -15,11 +15,11 @@ import java.util.Map;
 public class VideoRepositoryImpl implements VideoRepository {
 
     private final NamedParameterJdbcDaoSupport namedParameterJdbcDaoSupport;
-    private final SqlParameterSourceFactory<ImmutableVideo> parameterSourceFactory;
+    private final SqlParameterSourceFactory<Video> parameterSourceFactory;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final RowMapper<ImmutableVideo> rowMapper =
+    private final RowMapper<Video> rowMapper =
             JdbcTemplateMapperFactory
                     .newInstance()
                     .ignorePropertyNotFound()
@@ -33,20 +33,20 @@ public class VideoRepositoryImpl implements VideoRepository {
                             return null;
                         }
                     )
-                    .newRowMapper(ImmutableVideo.class);
+                    .newRowMapper(Video.class);
 
     public VideoRepositoryImpl(NamedParameterJdbcDaoSupport namedParameterJdbcDaoSupport) {
         this.namedParameterJdbcDaoSupport = namedParameterJdbcDaoSupport;
 
         this.parameterSourceFactory =
                 JdbcTemplateMapperFactory
-                        .newInstance().newSqlParameterSourceFactory(ImmutableVideo.class);
+                        .newInstance().newSqlParameterSourceFactory(Video.class);
 
         this.jdbcTemplate = this.namedParameterJdbcDaoSupport.getNamedParameterJdbcTemplate();
 
     }
 
-    public List<ImmutableVideo> retrieve(int lastSeen, int pageSize) {
+    public List<Video> retrieve(int lastSeen, int pageSize) {
         return jdbcTemplate.query(
                 """
                         select * from videos
@@ -61,7 +61,7 @@ public class VideoRepositoryImpl implements VideoRepository {
         );
     }
 
-    public void create(ImmutableVideo video) {
+    public void create(Video video) {
 
     }
 }

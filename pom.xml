@@ -30,14 +30,15 @@
 	</dependencyManagement>
 
 	<dependencies>
+			<dependency>
+				<groupId>com.google.auto.value</groupId>
+				<artifactId>auto-value-annotations</artifactId>
+				<version>1.9</version>
+				<scope>provided</scope>
+			</dependency>
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>s3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.immutables</groupId>
-			<artifactId>value</artifactId>
-			<version>2.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.coobird</groupId>
@@ -156,16 +157,22 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>com.google.auto.value</groupId>
+							<artifactId>auto-value</artifactId>
+							<version>1.9</version>
+						</path>
+					</annotationProcessorPaths>
 					<source>18</source>
 					<target>18</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

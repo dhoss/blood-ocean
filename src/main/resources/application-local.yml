@@ -21,3 +21,9 @@ cloud:
       endpoint: https://sfo3.digitaloceanspaces.com
       signature-duration: 10m # minutes
       video-bucket: trickle-media
+media:
+  video-mime-type: video/mp4
+logging:
+  level:
+    in.stonecolddev: DEBUG
+    org.springframework.jdbc.core: TRACE
