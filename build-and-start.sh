@@ -9,4 +9,5 @@ echo "SECRET :${BLOOD_OCEAN_SPACES_SECRET}";
 cd ~/projects/bocean/src/main/resources/static/bocean/ && \
 npm run build && \
 cd ~/projects/bocean/ && \
+./flyway.sh clean && ./flyway.sh migrate && \
 mvn clean spring-boot:run

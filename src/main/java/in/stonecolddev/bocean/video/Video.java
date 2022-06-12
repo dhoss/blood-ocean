@@ -85,9 +85,6 @@ public abstract class Video {
     public abstract Builder fileName(String fileName);
 
     @JsonProperty
-    public abstract Builder path(String path);
-
-    @JsonProperty
     public abstract Builder url(URL url);
 
     @JsonProperty
@@ -113,6 +110,6 @@ public abstract class Video {
 
   @Memoized
   public String thumbnail() {
-    return "%s_thumbnail.jpg".formatted(this.path());
+    return "%s_thumbnail.jpg".formatted(this.fileNameHash());
   }
 }

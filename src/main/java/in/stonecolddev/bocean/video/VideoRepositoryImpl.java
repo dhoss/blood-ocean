@@ -86,7 +86,6 @@ public class VideoRepositoryImpl implements VideoRepository {
             insert into videos(
               filename,
               filename_hash,
-              path,
               description,
               filesize,
               mime_type
@@ -94,7 +93,6 @@ public class VideoRepositoryImpl implements VideoRepository {
             values(
               :fileName,
               :filenameHash,
-              :path,
               :description,
               :fileSize,
               :mimeType
