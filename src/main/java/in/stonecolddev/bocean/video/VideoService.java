@@ -5,7 +5,6 @@ import in.stonecolddev.bocean.configuration.MediaConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeType;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -13,8 +12,10 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class VideoService {
       // TODO: think about adding a table that tracks a video/thumbnail id and a presigned url expiration timestamp
       //       only generate a new presigned URL if the current one has expired
       videos.add(
-          video.toBuilder().url(generatePresignedUrl(video.path()))
+          video.toBuilder().url(generatePresignedUrl(video.fileNameHash()))
                .thumbnailUrl(generatePresignedUrl(video.thumbnail())).build());
     }
 
@@ -66,12 +67,22 @@ public class VideoService {
   public Video upload(MultipartFile videoFile) throws IOException {
     var videoMimeType = mediaConfig.videoMimeType.toString();
 
+    Video video = Video.builder()
+                       .description("test")
+                       .fileSize((int)videoFile.getSize())
+                       .fileName(videoFile.getOriginalFilename())
+                       .mimeType(mediaConfig.videoMimeType)
+                       .path(videoFile.getOriginalFilename())
+                       .build();
+
+    log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
+
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
                                            PutObjectPresignRequest.builder().putObjectRequest(
                                                                       PutObjectRequest.builder()
                                                                                       .bucket(awsConfig.videoBucket)
-                                                                                      .key(videoFile.getOriginalFilename())
+                                                                                      .key(video.fileNameHash())
                                                                                       .contentType(videoMimeType)
                                                                                       .build())
                                                                   .signatureDuration(awsConfig.signatureDurationMinutes)
@@ -81,18 +92,17 @@ public class VideoService {
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", videoMimeType);
     connection.setRequestMethod("PUT");
-    ByteArrayOutputStream out =
-        (ByteArrayOutputStream) connection.getOutputStream();
+    connection.setFixedLengthStreamingMode(video.fileSize());
+   // ByteArrayOutputStream out =
+   //     (ByteArrayOutputStream) connection.getOutputStream();
+    OutputStream out = new BufferedOutputStream(connection.getOutputStream());
     out.write(videoFile.getBytes());
+    out.flush();
     out.close();
+    connection.disconnect();
 
-    Video video = Video.builder()
-                      .description("test")
-                      .fileSize(out.size())
-                      .fileName(videoFile.getOriginalFilename())
-                      .mimeType(mediaConfig.videoMimeType)
-                      .path(videoFile.getOriginalFilename())
-                      .build();
+ //   log.info("Connection response code {}", connection.getResponseCode());
+//    log.info("Bytes written: {}", out);
 
     videoRepository.create(video);
 
