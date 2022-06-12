@@ -12,6 +12,7 @@ import org.springframework.util.MimeType;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class VideoRepositoryImpl implements VideoRepository {
@@ -67,12 +68,25 @@ public class VideoRepositoryImpl implements VideoRepository {
     );
   }
 
+  public Optional<Video> find(String fileNameHash) {
+    return jdbcTemplate.query(
+        """
+            select * from videos
+            where filename_hash = :fileNameHash
+            """,
+        Map.of("fileNameHash", fileNameHash),
+        rowMapper
+    ).stream().findFirst();
+  }
+
   public void create(Video video) {
     jdbcTemplate.update(
         """
             begin;
             insert into videos(filename, filename_hash, path, description, filesize, mime_type)
-            values(:fileName, :filenameHash, :path, :description, :fileSize, :mimeType);
+            values(:fileName, :filenameHash, :path, :description, :fileSize, :mimeType)
+            on conflict (filename_hash)
+            do update set updated_on = now();
             commit;""",
         parameterSourceFactory.newSqlParameterSource(video)
     );
