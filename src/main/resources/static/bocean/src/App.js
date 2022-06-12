@@ -30,7 +30,6 @@ const App = () => {
 
   if (data)
     return (
-      <div className="bg-cover bg-blood-ocean">
         <div className="grid place-items-center h-screen">
           <section class="overflow-hidden text-gray-700 ">
             <div class="container px-5 py-2 mx-auto lg:pt-12 lg:px-32">
@@ -69,7 +68,6 @@ const App = () => {
                 />
             </Modal>
         </div>
-      </div>
     );
   return null;
 };
