@@ -102,45 +102,26 @@ public class VideoService {
   }
 
   private InputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
-  //private ByteArrayInputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
     log.info("Generating thumbnail for video {} bytes available", video.available());
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
     byte[] array = video.readAllBytes();
     log.info("initial thumbnail byte array {}", array.length);
-    ByteBufferSeekableByteChannel file =
-        ByteBufferSeekableByteChannel.readFromByteBuffer(
-            ByteBuffer.wrap(array)
-        );
+    ByteBufferSeekableByteChannel file = ByteBufferSeekableByteChannel.readFromByteBuffer(ByteBuffer.wrap(array));
+
     log.info("byte buffer size {}", file.size());
-    BufferedImage bufferedThumbnailFrame =
-        AWTUtil.toBufferedImage(
-            FrameGrab.getFrameFromChannel(
-                file,
-                1
-            )
-        );
+    BufferedImage bufferedThumbnailFrame = AWTUtil.toBufferedImage(FrameGrab.getFrameFromChannel(file, 1));
 
     log.info("buffered image information {} {}", bufferedThumbnailFrame.getWidth(), bufferedThumbnailFrame.getHeight());
     BufferedImage bufferedThumbnail = Thumbnails.of(bufferedThumbnailFrame)
-                                 .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight)
-                                 .asBufferedImage();
+                                                .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight).asBufferedImage();
+
     log.info("thumbnailator buffered image {} {}", bufferedThumbnail.getWidth(), bufferedThumbnail.getHeight());
-    //ImageOutputStream os = ImageIO.createImageOutputStream(im);
-   // PipedOutputStream os = new PipedOutputStream();
     log.info("pre image write os size {}", os.size());
-    //var imageBytes = ((DataBufferByte)bufferedThumbnail.getData().getDataBuffer()).getData();
-    ImageIO.write(
-        bufferedThumbnail
-        ,"jpg",
-        //mediaConfig.thumbnailMimeType.getType(),
-        os
+    ImageIO.write(bufferedThumbnail, mediaConfig.thumbnailMimeType.getType(), os);
 
-    );
-
-   byte[] imageBytes = os.toByteArray();
+    byte[] imageBytes = os.toByteArray();
     os.flush();
-   // //os.close();
 
     log.info("post imageio thumbnail byte array {} bytes", imageBytes.length);
     log.info("post imageio thumbnail os size {}", os.size());
