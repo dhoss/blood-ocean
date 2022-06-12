@@ -22,7 +22,12 @@ cloud:
       signature-duration: 10m # minutes
       video-bucket: trickle-media
 media:
-  video-mime-type: video/mp4
+  video:
+    mime-type: video/mp4
+  thumbnail:
+    mime-type: image/jpg
+    width: 480
+    height: 270
 logging:
   level:
     in.stonecolddev: DEBUG

@@ -2,7 +2,6 @@ package in.stonecolddev.bocean.video;
 
 import in.stonecolddev.bocean.configuration.AwsConfig;
 import in.stonecolddev.bocean.configuration.MediaConfig;
-import net.coobird.thumbnailator.Thumbnailator;
 import net.coobird.thumbnailator.Thumbnails;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
@@ -19,6 +18,12 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
@@ -70,6 +75,7 @@ public class VideoService {
   }
 
   private void uploadFile(String key, String mimeType, InputStream data) throws IOException {
+    log.info("Uploading file {} {} {} bytes available", key, mimeType, data.available());
 
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
@@ -92,26 +98,54 @@ public class VideoService {
     data.transferTo(out);
     out.flush();
     out.close();
-
     connection.disconnect();
   }
 
-  private ByteArrayInputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
+  private InputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
+  //private ByteArrayInputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
+    log.info("Generating thumbnail for video {} bytes available", video.available());
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
+    byte[] array = video.readAllBytes();
+    log.info("initial thumbnail byte array {}", array.length);
+    ByteBufferSeekableByteChannel file =
+        ByteBufferSeekableByteChannel.readFromByteBuffer(
+            ByteBuffer.wrap(array)
+        );
+    log.info("byte buffer size {}", file.size());
+    BufferedImage bufferedThumbnailFrame =
+        AWTUtil.toBufferedImage(
+            FrameGrab.getFrameFromChannel(
+                file,
+                1
+            )
+        );
+
+    log.info("buffered image information {} {}", bufferedThumbnailFrame.getWidth(), bufferedThumbnailFrame.getHeight());
+    BufferedImage bufferedThumbnail = Thumbnails.of(bufferedThumbnailFrame)
+                                 .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight)
+                                 .asBufferedImage();
+    log.info("thumbnailator buffered image {} {}", bufferedThumbnail.getWidth(), bufferedThumbnail.getHeight());
+    //ImageOutputStream os = ImageIO.createImageOutputStream(im);
+   // PipedOutputStream os = new PipedOutputStream();
+    log.info("pre image write os size {}", os.size());
+    //var imageBytes = ((DataBufferByte)bufferedThumbnail.getData().getDataBuffer()).getData();
     ImageIO.write(
-        Thumbnails.of(
-            AWTUtil.toBufferedImage(
-                FrameGrab.getFrameFromChannel(
-                    ByteBufferSeekableByteChannel.readFromByteBuffer(
-                        ByteBuffer.wrap(video.readAllBytes())), 1)))
-                  .size(200, 200)
-                  .asBufferedImage(),
-        "jpg",
+        bufferedThumbnail
+        ,"jpg",
+        //mediaConfig.thumbnailMimeType.getType(),
         os
+
     );
 
-    return new ByteArrayInputStream(os.toByteArray());
+   byte[] imageBytes = os.toByteArray();
+    os.flush();
+   // //os.close();
+
+    log.info("post imageio thumbnail byte array {} bytes", imageBytes.length);
+    log.info("post imageio thumbnail os size {}", os.size());
+
+    return new ByteArrayInputStream(imageBytes);
   }
 
   public Video upload(MultipartFile videoFile) throws IOException, URISyntaxException, JCodecException {
@@ -126,7 +160,7 @@ public class VideoService {
     log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
 
     uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getInputStream());
-    uploadFile(video.thumbnail(), "image/jpg", generateThumbnail(videoFile.getInputStream()));
+    uploadFile(video.thumbnail(), mediaConfig.thumbnailMimeType.getType(), generateThumbnail(videoFile.getInputStream()));
 
     videoRepository.create(video);
 
