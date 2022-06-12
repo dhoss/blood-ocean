@@ -72,7 +72,6 @@ public class VideoService {
                        .fileSize((int)videoFile.getSize())
                        .fileName(videoFile.getOriginalFilename())
                        .mimeType(mediaConfig.videoMimeType)
-                       .path(videoFile.getOriginalFilename())
                        .build();
 
     log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
@@ -93,16 +92,11 @@ public class VideoService {
     connection.setRequestProperty("Content-Type", videoMimeType);
     connection.setRequestMethod("PUT");
     connection.setFixedLengthStreamingMode(video.fileSize());
-   // ByteArrayOutputStream out =
-   //     (ByteArrayOutputStream) connection.getOutputStream();
     OutputStream out = new BufferedOutputStream(connection.getOutputStream());
     out.write(videoFile.getBytes());
     out.flush();
     out.close();
     connection.disconnect();
-
- //   log.info("Connection response code {}", connection.getResponseCode());
-//    log.info("Bytes written: {}", out);
 
     videoRepository.create(video);
 

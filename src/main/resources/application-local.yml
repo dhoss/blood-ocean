@@ -27,8 +27,3 @@ logging:
   level:
     in.stonecolddev: DEBUG
     org.springframework.jdbc.core: TRACE
-log4j:
-  logger:
-    com:
-      amazonaws:
-        request: DEBUG

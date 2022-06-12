@@ -14,7 +14,6 @@ import java.io.File;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @AutoValue
 @JsonSerialize(as = Video.class)
@@ -30,14 +29,12 @@ public abstract class Video {
   @Memoized
   @JsonProperty
   public String fileNameHash() {
-    int hash = ByteBuffer.wrap(
-        DigestUtils.md5Digest(
-            this.fileName().getBytes()
-        )
-    ).getInt();
+    int hash =
+        ByteBuffer.wrap(DigestUtils.md5Digest(this.fileName().getBytes())).getInt();
 
     int mask = 255;
     var fileSeparator = File.separator;
+
     return String.format(
         "%s%02x%s%02x",
         fileSeparator,
@@ -45,13 +42,7 @@ public abstract class Video {
         fileSeparator,
         ((hash >> 8) & mask)
     );
-//           + String.format("%02x", )
-//           + fileSeparator
-//           + String.format("%02x", (hash >> 8) & mask);
   }
-
-  @JsonProperty
-  public abstract String path();
 
   @Nullable
   @JsonProperty

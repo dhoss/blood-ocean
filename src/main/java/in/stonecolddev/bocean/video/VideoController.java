@@ -47,7 +47,6 @@ public class VideoController {
                 .description("foart!")
                 .fileSize(1)
                 .mimeType(MimeType.valueOf("video/mp4"))
-                .path(path)
                 .createdOn(OffsetDateTime.now())
                 .updatedOn(OffsetDateTime.now())
                 .build();
