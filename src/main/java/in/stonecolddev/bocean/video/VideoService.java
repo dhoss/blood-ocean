@@ -4,6 +4,7 @@ import in.stonecolddev.bocean.configuration.AwsConfig;
 import in.stonecolddev.bocean.configuration.MediaConfig;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
+import org.jcodec.common.io.ByteBufferSeekableByteChannel;
 import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 import org.slf4j.Logger;
@@ -17,11 +18,14 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +55,6 @@ public class VideoService {
     this.mediaConfig = mediaConfig;
   }
 
-  // TODO: directory hashing (https://medium.com/eonian-technologies/file-name-hashing-creating-a-hashed-directory-structure-eabb03aa4091)
   // TODO: mark and sweep resized images (https://www.educative.io/courses/a-quick-primer-on-garbage-collection-algorithms/jy6v)
 
   public List<Video> retrieve(int lastSeen, int pageSize) {
@@ -68,7 +71,7 @@ public class VideoService {
     return videos;
   }
 
-  private void uploadFile(String key, String mimeType, InputStream data) throws IOException { //,byte[] data) throws IOException {
+  private void uploadFile(String key, String mimeType, InputStream data) throws IOException {
 
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
@@ -85,26 +88,29 @@ public class VideoService {
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", mimeType);
     connection.setRequestMethod("PUT");
-    log.debug("**** INPUTSTREAM AVAILABLE {}", data.available());
     connection.setFixedLengthStreamingMode(data.available());
 
     OutputStream out = new BufferedOutputStream(connection.getOutputStream());
     data.transferTo(out);
-   // out.write(data);
     out.flush();
     out.close();
 
     connection.disconnect();
   }
 
-  private void generateThumbnail(URI video) throws IOException, JCodecException {
-    Picture picture = FrameGrab.getFrameFromFile(new File(video), 1);
+  private ByteArrayInputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
+    Picture picture = FrameGrab.getFrameFromChannel(
+        ByteBufferSeekableByteChannel.readFromByteBuffer(ByteBuffer.wrap(video.readAllBytes())), 1);//getFrameFromFile(new File(video), 1);
 
+    log.debug("**** PICTURE {}", picture);
     BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
-    ImageIO.write(bufferedImage, "jpg", new File("frame42.png"));
+    log.debug("**** BUFFERED IMAGE {}", bufferedImage);
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ImageIO.write(bufferedImage, "jpg", os);
+    return new ByteArrayInputStream(os.toByteArray());
   }
 
-  public Video upload(MultipartFile videoFile) throws IOException {
+  public Video upload(MultipartFile videoFile) throws IOException, URISyntaxException, JCodecException {
 
     Video video = Video.builder()
                        .description("test")
@@ -115,7 +121,8 @@ public class VideoService {
 
     log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
 
-    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getInputStream());//videoFile.getBytes());
+    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getInputStream());
+    uploadFile(video.thumbnail(), "image/jpg", generateThumbnail(videoFile.getInputStream()));
 
     videoRepository.create(video);
 

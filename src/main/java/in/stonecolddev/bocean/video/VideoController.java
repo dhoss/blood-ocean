@@ -1,5 +1,6 @@
 package in.stonecolddev.bocean.video;
 
+import org.jcodec.api.JCodecException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class VideoController {
     }
 
     @PostMapping
-    public Video upload(@RequestParam("video") MultipartFile video) throws IOException {
+    public Video upload(@RequestParam("video") MultipartFile video) throws IOException, JCodecException, URISyntaxException {
         return videoService.upload(video);
     }
 
