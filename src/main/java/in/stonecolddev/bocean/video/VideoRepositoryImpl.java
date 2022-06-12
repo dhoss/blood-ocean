@@ -83,8 +83,22 @@ public class VideoRepositoryImpl implements VideoRepository {
     jdbcTemplate.update(
         """
             begin;
-            insert into videos(filename, filename_hash, path, description, filesize, mime_type)
-            values(:fileName, :filenameHash, :path, :description, :fileSize, :mimeType)
+            insert into videos(
+              filename,
+              filename_hash,
+              path,
+              description,
+              filesize,
+              mime_type
+            )
+            values(
+              :fileName,
+              :filenameHash,
+              :path,
+              :description,
+              :fileSize,
+              :mimeType
+            )
             on conflict (filename_hash)
             do update set updated_on = now();
             commit;""",

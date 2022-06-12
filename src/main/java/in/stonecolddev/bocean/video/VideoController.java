@@ -44,7 +44,6 @@ public class VideoController {
             builder()
                 .id(1)
                 .fileName("fart")
-                .fileNameHash("frrrrt")
                 .description("foart!")
                 .fileSize(1)
                 .mimeType(MimeType.valueOf("video/mp4"))

@@ -53,6 +53,8 @@ public class VideoService {
     var videos = new ArrayList<Video>();
 
     for (var video : videoRepository.retrieve(lastSeen, pageSize)) {
+      // TODO: think about adding a table that tracks a video/thumbnail id and a presigned url expiration timestamp
+      //       only generate a new presigned URL if the current one has expired
       videos.add(
           video.toBuilder().url(generatePresignedUrl(video.path()))
                .thumbnailUrl(generatePresignedUrl(video.thumbnail())).build());
@@ -62,7 +64,6 @@ public class VideoService {
   }
 
   public Video upload(MultipartFile videoFile) throws IOException {
-    log.debug("**** UPLOADING {}", videoFile);
     var videoMimeType = mediaConfig.videoMimeType.toString();
 
     HttpURLConnection connection =
@@ -84,13 +85,11 @@ public class VideoService {
         (ByteArrayOutputStream) connection.getOutputStream();
     out.write(videoFile.getBytes());
     out.close();
-    log.debug("**** UPLOAD STATUS rESULT {} {}", connection.getResponseCode(), out.size());
 
     Video video = Video.builder()
                       .description("test")
                       .fileSize(out.size())
                       .fileName(videoFile.getOriginalFilename())
-                      .fileNameHash(videoFile.getName())
                       .mimeType(mediaConfig.videoMimeType)
                       .path(videoFile.getOriginalFilename())
                       .build();

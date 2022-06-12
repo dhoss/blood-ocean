@@ -6,11 +6,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.MimeType;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @AutoValue
 @JsonSerialize(as = Video.class)
@@ -23,8 +27,28 @@ public abstract class Video {
   @JsonProperty
   public abstract String fileName();
 
+  @Memoized
   @JsonProperty
-  public abstract String fileNameHash();
+  public String fileNameHash() {
+    int hash = ByteBuffer.wrap(
+        DigestUtils.md5Digest(
+            this.fileName().getBytes()
+        )
+    ).getInt();
+
+    int mask = 255;
+    var fileSeparator = File.separator;
+    return String.format(
+        "%s%02x%s%02x",
+        fileSeparator,
+        (hash & mask),
+        fileSeparator,
+        ((hash >> 8) & mask)
+    );
+//           + String.format("%02x", )
+//           + fileSeparator
+//           + String.format("%02x", (hash >> 8) & mask);
+  }
 
   @JsonProperty
   public abstract String path();
@@ -68,9 +92,6 @@ public abstract class Video {
 
     @JsonProperty
     public abstract Builder fileName(String fileName);
-
-    @JsonProperty
-    public abstract Builder fileNameHash(String fileNameHash);
 
     @JsonProperty
     public abstract Builder path(String path);
