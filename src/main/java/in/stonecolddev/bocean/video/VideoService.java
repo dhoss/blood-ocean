@@ -2,10 +2,11 @@ package in.stonecolddev.bocean.video;
 
 import in.stonecolddev.bocean.configuration.AwsConfig;
 import in.stonecolddev.bocean.configuration.MediaConfig;
+import net.coobird.thumbnailator.Thumbnailator;
+import net.coobird.thumbnailator.Thumbnails;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.common.io.ByteBufferSeekableByteChannel;
-import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,8 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -88,7 +86,7 @@ public class VideoService {
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", mimeType);
     connection.setRequestMethod("PUT");
-    connection.setFixedLengthStreamingMode(data.available());
+    connection.setFixedLengthStreamingMode(data.available()); // I have no clue if calling available() is a good idea here
 
     OutputStream out = new BufferedOutputStream(connection.getOutputStream());
     data.transferTo(out);
@@ -99,14 +97,20 @@ public class VideoService {
   }
 
   private ByteArrayInputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
-    Picture picture = FrameGrab.getFrameFromChannel(
-        ByteBufferSeekableByteChannel.readFromByteBuffer(ByteBuffer.wrap(video.readAllBytes())), 1);//getFrameFromFile(new File(video), 1);
-
-    log.debug("**** PICTURE {}", picture);
-    BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
-    log.debug("**** BUFFERED IMAGE {}", bufferedImage);
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    ImageIO.write(bufferedImage, "jpg", os);
+
+    ImageIO.write(
+        Thumbnails.of(
+            AWTUtil.toBufferedImage(
+                FrameGrab.getFrameFromChannel(
+                    ByteBufferSeekableByteChannel.readFromByteBuffer(
+                        ByteBuffer.wrap(video.readAllBytes())), 1)))
+                  .size(200, 200)
+                  .asBufferedImage(),
+        "jpg",
+        os
+    );
+
     return new ByteArrayInputStream(os.toByteArray());
   }
 
