@@ -35,13 +35,8 @@ public abstract class Video {
     int mask = 255;
     var fileSeparator = File.separator;
 
-    return String.format(
-        "%s%02x%s%02x",
-        fileSeparator,
-        (hash & mask),
-        fileSeparator,
-        ((hash >> 8) & mask)
-    );
+    return "%s%02x%s%02x".formatted(
+        fileSeparator, (hash & mask), fileSeparator, ((hash >> 8) & mask));
   }
 
   @Nullable
