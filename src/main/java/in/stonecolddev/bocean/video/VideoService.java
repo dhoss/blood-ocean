@@ -2,6 +2,10 @@ package in.stonecolddev.bocean.video;
 
 import in.stonecolddev.bocean.configuration.AwsConfig;
 import in.stonecolddev.bocean.configuration.MediaConfig;
+import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
+import org.jcodec.common.model.Picture;
+import org.jcodec.scale.AWTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,11 +16,11 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +68,42 @@ public class VideoService {
     return videos;
   }
 
+  private void generateThumbnail(URI video) throws IOException, JCodecException {
+    int frameNumber = 1;
+    Picture picture = FrameGrab.getFrameFromFile(new File(video), frameNumber);
+
+    BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
+    ImageIO.write(bufferedImage, "jpg", new File("frame42.png"));
+  }
+
+  private void uploadFile(String key, String mimeType, byte[] data) throws IOException {
+
+    HttpURLConnection connection =
+        (HttpURLConnection) s3Presigner.presignPutObject(
+                                           PutObjectPresignRequest.builder().putObjectRequest(
+                                                                      PutObjectRequest.builder()
+                                                                                      .bucket(awsConfig.videoBucket)
+                                                                                      .key(key)
+                                                                                      .contentType(mimeType)
+                                                                                      .build())
+                                                                  .signatureDuration(awsConfig.signatureDurationMinutes)
+                                                                  .build())
+                                       .url()
+                                       .openConnection();
+    connection.setDoOutput(true);
+    connection.setRequestProperty("Content-Type", mimeType);
+    connection.setRequestMethod("PUT");
+    connection.setFixedLengthStreamingMode(data.length);
+
+    OutputStream out = new BufferedOutputStream(connection.getOutputStream());
+    out.write(data);
+    out.flush();
+    out.close();
+
+    connection.disconnect();
+  }
+
   public Video upload(MultipartFile videoFile) throws IOException {
-    var videoMimeType = mediaConfig.videoMimeType.toString();
 
     Video video = Video.builder()
                        .description("test")
@@ -76,32 +114,11 @@ public class VideoService {
 
     log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
 
-    HttpURLConnection connection =
-        (HttpURLConnection) s3Presigner.presignPutObject(
-                                           PutObjectPresignRequest.builder().putObjectRequest(
-                                                                      PutObjectRequest.builder()
-                                                                                      .bucket(awsConfig.videoBucket)
-                                                                                      .key(video.fileNameHash())
-                                                                                      .contentType(videoMimeType)
-                                                                                      .build())
-                                                                  .signatureDuration(awsConfig.signatureDurationMinutes)
-                                                                  .build())
-                                       .url()
-                                       .openConnection();
-    connection.setDoOutput(true);
-    connection.setRequestProperty("Content-Type", videoMimeType);
-    connection.setRequestMethod("PUT");
-    connection.setFixedLengthStreamingMode(video.fileSize());
-    OutputStream out = new BufferedOutputStream(connection.getOutputStream());
-    out.write(videoFile.getBytes());
-    out.flush();
-    out.close();
-    connection.disconnect();
+    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getBytes());
 
     videoRepository.create(video);
 
     return video;
-
   }
 
   private URL generatePresignedUrl(String path) {
