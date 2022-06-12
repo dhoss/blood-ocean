@@ -68,15 +68,7 @@ public class VideoService {
     return videos;
   }
 
-  private void generateThumbnail(URI video) throws IOException, JCodecException {
-    int frameNumber = 1;
-    Picture picture = FrameGrab.getFrameFromFile(new File(video), frameNumber);
-
-    BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
-    ImageIO.write(bufferedImage, "jpg", new File("frame42.png"));
-  }
-
-  private void uploadFile(String key, String mimeType, byte[] data) throws IOException {
+  private void uploadFile(String key, String mimeType, InputStream data) throws IOException { //,byte[] data) throws IOException {
 
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
@@ -93,14 +85,23 @@ public class VideoService {
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", mimeType);
     connection.setRequestMethod("PUT");
-    connection.setFixedLengthStreamingMode(data.length);
+    log.debug("**** INPUTSTREAM AVAILABLE {}", data.available());
+    connection.setFixedLengthStreamingMode(data.available());
 
     OutputStream out = new BufferedOutputStream(connection.getOutputStream());
-    out.write(data);
+    data.transferTo(out);
+   // out.write(data);
     out.flush();
     out.close();
 
     connection.disconnect();
+  }
+
+  private void generateThumbnail(URI video) throws IOException, JCodecException {
+    Picture picture = FrameGrab.getFrameFromFile(new File(video), 1);
+
+    BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
+    ImageIO.write(bufferedImage, "jpg", new File("frame42.png"));
   }
 
   public Video upload(MultipartFile videoFile) throws IOException {
@@ -114,7 +115,7 @@ public class VideoService {
 
     log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
 
-    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getBytes());
+    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getInputStream());//videoFile.getBytes());
 
     videoRepository.create(video);
 
