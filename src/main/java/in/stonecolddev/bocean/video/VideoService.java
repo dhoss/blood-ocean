@@ -18,12 +18,6 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.MemoryCacheImageInputStream;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
@@ -74,8 +68,14 @@ public class VideoService {
     return videos;
   }
 
-  private void uploadFile(String key, String mimeType, InputStream data) throws IOException {
-    log.info("Uploading file {} {} {} bytes available", key, mimeType, data.available());
+  private void uploadFile(
+      String key,
+      String mimeType,
+      InputStream data
+  ) throws IOException {
+    log.info("Uploading file {} {} {} bytes available", key, mimeType,
+             data.available()
+    );
 
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
@@ -85,14 +85,16 @@ public class VideoService {
                                                                                       .key(key)
                                                                                       .contentType(mimeType)
                                                                                       .build())
-                                                                  .signatureDuration(awsConfig.signatureDurationMinutes)
+                                                                  .signatureDuration(
+                                                                      awsConfig.signatureDurationMinutes)
                                                                   .build())
                                        .url()
                                        .openConnection();
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", mimeType);
     connection.setRequestMethod("PUT");
-    connection.setFixedLengthStreamingMode(data.available()); // I have no clue if calling available() is a good idea here
+    connection.setFixedLengthStreamingMode(
+        data.available()); // I have no clue if calling available() is a good idea here
 
     OutputStream out = new BufferedOutputStream(connection.getOutputStream());
     data.transferTo(out);
@@ -102,13 +104,24 @@ public class VideoService {
   }
 
   private InputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
-    log.info("Generating thumbnail for video {} bytes available", video.available());
+    log.info("Generating thumbnail for video {} bytes available",
+             video.available()
+    );
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-    ImageIO.write(Thumbnails.of(AWTUtil.toBufferedImage(FrameGrab.getFrameFromChannel(
-        ByteBufferSeekableByteChannel.readFromByteBuffer(ByteBuffer.wrap(
-            video.readAllBytes())), 1)))
-                            .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight).asBufferedImage(), "jpg", os);
+    ImageIO.write(
+        Thumbnails.of(
+                      AWTUtil.toBufferedImage(
+                          FrameGrab.getFrameFromChannel(
+                              ByteBufferSeekableByteChannel.readFromByteBuffer(
+                                  ByteBuffer.wrap(video.readAllBytes())),
+                              1
+                          )
+                      )
+                  )
+                  .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight)
+                  .asBufferedImage(), "jpg", os
+    );
 
     os.flush();
 
@@ -119,15 +132,21 @@ public class VideoService {
 
     Video video = Video.builder()
                        .description("test")
-                       .fileSize((int)videoFile.getSize())
+                       .fileSize((int) videoFile.getSize())
                        .fileName(videoFile.getOriginalFilename())
                        .mimeType(mediaConfig.videoMimeType)
                        .build();
 
-    log.info("beginning upload on {} size {} file name hash {}", video.fileName(), video.fileSize(), video.fileNameHash());
+    log.info("beginning upload on {} size {} file name hash {}",
+             video.fileName(), video.fileSize(), video.fileNameHash()
+    );
 
-    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(), videoFile.getInputStream());
-    uploadFile(video.thumbnail(), mediaConfig.thumbnailMimeType.getType(), generateThumbnail(videoFile.getInputStream()));
+    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(),
+               videoFile.getInputStream()
+    );
+    uploadFile(video.thumbnail(), mediaConfig.thumbnailMimeType.getType(),
+               generateThumbnail(videoFile.getInputStream())
+    );
 
     videoRepository.create(video);
 
@@ -137,11 +156,13 @@ public class VideoService {
   private URL generatePresignedUrl(String path) {
     return s3Presigner.presignGetObject(
         GetObjectPresignRequest.builder()
-                               .signatureDuration(awsConfig.signatureDurationMinutes)
+                               .signatureDuration(
+                                   awsConfig.signatureDurationMinutes)
                                .getObjectRequest(
                                    GetObjectRequest.builder()
                                                    .key(path)
-                                                   .bucket(awsConfig.videoBucket)
+                                                   .bucket(
+                                                       awsConfig.videoBucket)
                                                    .build())
                                .build()).url();
   }
