@@ -58,8 +58,6 @@ public class VideoService {
     var videos = new ArrayList<Video>();
 
     for (var video : videoRepository.retrieve(lastSeen, pageSize)) {
-      // TODO: think about adding a table that tracks a video/thumbnail id and a presigned url expiration timestamp
-      //       only generate a new presigned URL if the current one has expired
       videos.add(
           video.toBuilder().url(generatePresignedUrl(video.fileNameHash()))
                .thumbnailUrl(generatePresignedUrl(video.thumbnail())).build());
@@ -68,6 +66,8 @@ public class VideoService {
     return videos;
   }
 
+  // TODO: figure out formatting
+  // TODO: this should be an async call
   private void uploadFile(
       String key,
       String mimeType,
@@ -77,6 +77,7 @@ public class VideoService {
              data.available()
     );
 
+    // TODO: consider multipart uploads
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
                                            PutObjectPresignRequest.builder()
@@ -107,6 +108,7 @@ public class VideoService {
     connection.disconnect();
   }
 
+  // TODO: this should be an async call
   private InputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
     log.info(
         "Generating thumbnail for video {} bytes available",
@@ -162,6 +164,8 @@ public class VideoService {
     return video;
   }
 
+  // TODO: cache this with an expire time that's the same as the signature duration
+  //       then just return the cached url (indexed by path) if it's still valid
   private URL generatePresignedUrl(String path) {
     return s3Presigner.presignGetObject(
         GetObjectPresignRequest.builder()
