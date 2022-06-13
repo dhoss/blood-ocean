@@ -79,11 +79,15 @@ public class VideoService {
 
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
-                                           PutObjectPresignRequest.builder().putObjectRequest(
+                                           PutObjectPresignRequest.builder()
+                                                                  .putObjectRequest(
                                                                       PutObjectRequest.builder()
-                                                                                      .bucket(awsConfig.videoBucket)
-                                                                                      .key(key)
-                                                                                      .contentType(mimeType)
+                                                                                      .bucket(
+                                                                                          awsConfig.videoBucket)
+                                                                                      .key(
+                                                                                          key)
+                                                                                      .contentType(
+                                                                                          mimeType)
                                                                                       .build())
                                                                   .signatureDuration(
                                                                       awsConfig.signatureDurationMinutes)
