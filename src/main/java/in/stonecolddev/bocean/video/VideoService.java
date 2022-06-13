@@ -104,8 +104,9 @@ public class VideoService {
   }
 
   private InputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
-    log.info("Generating thumbnail for video {} bytes available",
-             video.available()
+    log.info(
+        "Generating thumbnail for video {} bytes available",
+        video.available()
     );
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
@@ -141,11 +142,15 @@ public class VideoService {
              video.fileName(), video.fileSize(), video.fileNameHash()
     );
 
-    uploadFile(video.fileNameHash(), mediaConfig.videoMimeType.getType(),
-               videoFile.getInputStream()
+    uploadFile(
+        video.fileNameHash(),
+        mediaConfig.videoMimeType.getType(),
+        videoFile.getInputStream()
     );
-    uploadFile(video.thumbnail(), mediaConfig.thumbnailMimeType.getType(),
-               generateThumbnail(videoFile.getInputStream())
+    uploadFile(
+        video.thumbnail(),
+        mediaConfig.thumbnailMimeType.getType(),
+        generateThumbnail(videoFile.getInputStream())
     );
 
     videoRepository.create(video);
