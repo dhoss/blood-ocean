@@ -118,7 +118,7 @@ public class VideoService {
 
     log.info("thumbnailator buffered image {} {}", bufferedThumbnail.getWidth(), bufferedThumbnail.getHeight());
     log.info("pre image write os size {}", os.size());
-    ImageIO.write(bufferedThumbnail, mediaConfig.thumbnailMimeType.getType(), os);
+    ImageIO.write(bufferedThumbnail, "jpg", os);
 
     byte[] imageBytes = os.toByteArray();
     os.flush();
