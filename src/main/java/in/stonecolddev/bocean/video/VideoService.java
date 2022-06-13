@@ -105,28 +105,14 @@ public class VideoService {
     log.info("Generating thumbnail for video {} bytes available", video.available());
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-    byte[] array = video.readAllBytes();
-    log.info("initial thumbnail byte array {}", array.length);
-    ByteBufferSeekableByteChannel file = ByteBufferSeekableByteChannel.readFromByteBuffer(ByteBuffer.wrap(array));
+    ImageIO.write(Thumbnails.of(AWTUtil.toBufferedImage(FrameGrab.getFrameFromChannel(
+        ByteBufferSeekableByteChannel.readFromByteBuffer(ByteBuffer.wrap(
+            video.readAllBytes())), 1)))
+                            .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight).asBufferedImage(), "jpg", os);
 
-    log.info("byte buffer size {}", file.size());
-    BufferedImage bufferedThumbnailFrame = AWTUtil.toBufferedImage(FrameGrab.getFrameFromChannel(file, 1));
-
-    log.info("buffered image information {} {}", bufferedThumbnailFrame.getWidth(), bufferedThumbnailFrame.getHeight());
-    BufferedImage bufferedThumbnail = Thumbnails.of(bufferedThumbnailFrame)
-                                                .size(mediaConfig.thumbnailWidth, mediaConfig.thumbnailHeight).asBufferedImage();
-
-    log.info("thumbnailator buffered image {} {}", bufferedThumbnail.getWidth(), bufferedThumbnail.getHeight());
-    log.info("pre image write os size {}", os.size());
-    ImageIO.write(bufferedThumbnail, "jpg", os);
-
-    byte[] imageBytes = os.toByteArray();
     os.flush();
 
-    log.info("post imageio thumbnail byte array {} bytes", imageBytes.length);
-    log.info("post imageio thumbnail os size {}", os.size());
-
-    return new ByteArrayInputStream(imageBytes);
+    return new ByteArrayInputStream(os.toByteArray());
   }
 
   public Video upload(MultipartFile videoFile) throws IOException, URISyntaxException, JCodecException {
