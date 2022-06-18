@@ -9,6 +9,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - run: git checkout ${{ github.ref_name }}
+      - name: Cache maven packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -19,7 +24,6 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
-          directory: ./target/
+          directory: ./target/site/jacoco/
           fail_ci_if_error: true
-          path_to_write_report: ./coverage/codecov_report.txt
           verbose: true
