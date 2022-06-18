@@ -1,0 +1,34 @@
+spring:
+  config:
+    activate:
+      on-profile: it-test
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      # TODO: rename these to bocean
+      jdbc-url: >
+        jdbc:postgresql://localhost:5432/trickle
+      pool-name: bocean-pool
+      username: trickle
+      password: trickle
+cloud:
+  aws:
+    credentials:
+      access-key: dummy
+      secret-key: dummy
+    region: sfo3
+    s3:
+      endpoint: https://sfo3.digitaloceanspaces.com
+      signature-duration: 10m # minutes
+      video-bucket: trickle-media
+media:
+  video:
+    mime-type: video/mp4
+  thumbnail:
+    mime-type: image/jpg
+    width: 480
+    height: 270
+logging:
+  level:
+    in.stonecolddev: DEBUG
+    org.springframework.jdbc.core: TRACE

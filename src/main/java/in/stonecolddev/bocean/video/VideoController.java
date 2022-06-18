@@ -4,13 +4,11 @@ import org.jcodec.api.JCodecException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -38,19 +36,5 @@ public class VideoController {
             @RequestParam(defaultValue = "50") int pageSize) {
 
         return this.videoService.retrieve(lastSeen, pageSize);
-    }
-
-    @GetMapping("/{path}")
-    public Video find(@PathVariable String path) {
-        return Video.
-            builder()
-                .id(1)
-                .fileName("fart")
-                .description("foart!")
-                .fileSize(1)
-                .mimeType(MimeType.valueOf("video/mp4"))
-                .createdOn(OffsetDateTime.now())
-                .updatedOn(OffsetDateTime.now())
-                .build();
     }
 }
