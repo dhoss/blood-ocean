@@ -26,8 +26,6 @@ jobs:
           java-version: 1.18
       - name: Generate coverage report
         run: mvn clean -Dgroups=unit-test jacoco:prepare-agent install jacoco:report
-      - name: pwd
-        run: echo "WORKING DIR $(ls -la target/)"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
