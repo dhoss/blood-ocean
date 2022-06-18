@@ -20,10 +20,9 @@ jobs:
           java-version: 1.18
       - name: Generate coverage report
         run: |
-          mvn clean -Dgroups=unit-test test --file pom.xml
+          echo pwd && mvn clean -Dgroups=unit-test test --file pom.xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
-        run: echo pwd
         with:
           directory: ./target/site/jacoco/
           fail_ci_if_error: true
