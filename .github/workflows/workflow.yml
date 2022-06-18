@@ -28,7 +28,7 @@ jobs:
         run: |
           mvn clean -Dgroups=unit-test test --file pom.xml
       - name: pwd
-        run: echo "WORKING DIR $(ls -la)"
+        run: echo "WORKING DIR $(ls -la target/)"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
