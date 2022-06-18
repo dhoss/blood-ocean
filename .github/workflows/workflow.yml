@@ -16,6 +16,10 @@ jobs:
         with:
           path: ~/.m2
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -24,7 +28,7 @@ jobs:
         run: |
           mvn clean -Dgroups=unit-test test --file pom.xml
       - name: pwd
-        run: echo "WORKING DIR $(pwd)"
+        run: echo "WORKING DIR $(ls -la)"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
