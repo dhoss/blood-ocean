@@ -1,0 +1,25 @@
+name: blood ocean
+on: [push]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: codecov/codecov-action@v2
+      - name: Checkout
+        uses: actions/checkout@v1
+          - run: git checkout ${{ github.ref_name }}
+          - name: Set up JDK
+            uses: actions/setup-java@v1
+            with:
+              java-version: 1.18
+      - name: Generate coverage report
+        run: |
+          mvn clean -Dgroups=unit-test test --file pom.xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          directory: ./target/
+          fail_ci_if_error: true
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true
