@@ -68,4 +68,6 @@ public class VideoControllerTest {
 
     verify(videoService, times(1)).retrieve(0, 50);
   }
+
+  // TODO: file upload https://www.baeldung.com/spring-multipart-post-request-test
 }
