@@ -52,7 +52,6 @@ public class VideoService {
   }
 
   // TODO: mark and sweep resized images (https://www.educative.io/courses/a-quick-primer-on-garbage-collection-algorithms/jy6v)
-
   public List<Video> retrieve(int lastSeen, int pageSize) {
     var videos = new ArrayList<Video>();
 
