@@ -153,6 +153,7 @@ public class VideoService {
         mediaConfig.videoMimeType.getType(),
         videoFile.getInputStream()
     );
+
     uploadFile(
         video.thumbnail(),
         mediaConfig.thumbnailMimeType.getType(),
