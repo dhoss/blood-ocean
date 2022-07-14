@@ -31,7 +31,6 @@ public class VideoService {
 
   private final Logger log = LoggerFactory.getLogger(VideoService.class);
 
-
   private final S3Presigner s3Presigner;
 
   private final AwsConfig awsConfig;
@@ -67,7 +66,6 @@ public class VideoService {
   }
 
   // TODO: figure out formatting
-  // TODO: this should be an async call
   private void uploadFile(
       String key,
       String mimeType,
@@ -83,15 +81,11 @@ public class VideoService {
                                            PutObjectPresignRequest.builder()
                                                                   .putObjectRequest(
                                                                       PutObjectRequest.builder()
-                                                                                      .bucket(
-                                                                                          awsConfig.videoBucket)
-                                                                                      .key(
-                                                                                          key)
-                                                                                      .contentType(
-                                                                                          mimeType)
+                                                                                      .bucket(awsConfig.videoBucket)
+                                                                                      .key(key)
+                                                                                      .contentType(mimeType)
                                                                                       .build())
-                                                                  .signatureDuration(
-                                                                      awsConfig.signatureDurationMinutes)
+                                                                  .signatureDuration(awsConfig.signatureDurationMinutes)
                                                                   .build())
                                        .url()
                                        .openConnection();
@@ -113,6 +107,7 @@ public class VideoService {
         "Generating thumbnail for video {} bytes available",
         video.available()
     );
+
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
     ImageIO.write(
@@ -147,6 +142,7 @@ public class VideoService {
              video.fileName(), video.fileSize(), video.fileNameHash()
     );
 
+    // TODO: these should be async calls
     uploadFile(
         video.fileNameHash(),
         mediaConfig.videoMimeType.getType(),

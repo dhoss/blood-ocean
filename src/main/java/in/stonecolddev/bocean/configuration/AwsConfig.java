@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import java.net.URI;
 import java.time.Duration;
 
+// TODO: switch this to a record and adjust configuration annotation and config keys
 @Configuration
 public class AwsConfig {
 
