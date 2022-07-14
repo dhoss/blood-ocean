@@ -96,11 +96,8 @@ public class VideoService {
   }
 
   // TODO: figure out formatting
-  private void uploadFile(
-      String key,
-      String mimeType,
-      InputStream data
-  ) throws IOException {
+  private void uploadFile(String key, String mimeType, InputStream data) throws IOException {
+
     log.info("Uploading file {} {} {} bytes available", key, mimeType, data.available());
 
     // TODO: consider multipart uploads
