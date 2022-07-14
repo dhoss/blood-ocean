@@ -57,11 +57,42 @@ public class VideoService {
 
     for (var video : videoRepository.retrieve(lastSeen, pageSize)) {
       videos.add(
-          video.toBuilder().url(generatePresignedUrl(video.fileNameHash()))
-               .thumbnailUrl(generatePresignedUrl(video.thumbnail())).build());
+          video.toBuilder().url(generatePresignedGetUrl(video.fileNameHash()))
+               .thumbnailUrl(generatePresignedGetUrl(video.thumbnail())).build());
     }
 
     return videos;
+  }
+
+  public Video upload(MultipartFile videoFile) throws IOException, URISyntaxException, JCodecException {
+
+    var video = Video.builder()
+                       .description("test")
+                       .fileSize((int) videoFile.getSize())
+                       .fileName(videoFile.getOriginalFilename())
+                       .mimeType(mediaConfig.videoMimeType)
+                       .build();
+
+    log.info("beginning upload on {} size {} file name hash {}",
+             video.fileName(), video.fileSize(), video.fileNameHash()
+    );
+
+    // TODO: these should be async calls
+    uploadFile(
+        video.fileNameHash(),
+        mediaConfig.videoMimeType.getType(),
+        videoFile.getInputStream()
+    );
+
+    uploadFile(
+        video.thumbnail(),
+        mediaConfig.thumbnailMimeType.getType(),
+        generateThumbnail(videoFile.getInputStream())
+    );
+
+    videoRepository.create(video);
+
+    return video;
   }
 
   // TODO: figure out formatting
@@ -70,9 +101,7 @@ public class VideoService {
       String mimeType,
       InputStream data
   ) throws IOException {
-    log.info("Uploading file {} {} {} bytes available", key, mimeType,
-             data.available()
-    );
+    log.info("Uploading file {} {} {} bytes available", key, mimeType, data.available());
 
     // TODO: consider multipart uploads
     HttpURLConnection connection =
@@ -128,49 +157,17 @@ public class VideoService {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
-  public Video upload(MultipartFile videoFile) throws IOException, URISyntaxException, JCodecException {
-
-    Video video = Video.builder()
-                       .description("test")
-                       .fileSize((int) videoFile.getSize())
-                       .fileName(videoFile.getOriginalFilename())
-                       .mimeType(mediaConfig.videoMimeType)
-                       .build();
-
-    log.info("beginning upload on {} size {} file name hash {}",
-             video.fileName(), video.fileSize(), video.fileNameHash()
-    );
-
-    // TODO: these should be async calls
-    uploadFile(
-        video.fileNameHash(),
-        mediaConfig.videoMimeType.getType(),
-        videoFile.getInputStream()
-    );
-
-    uploadFile(
-        video.thumbnail(),
-        mediaConfig.thumbnailMimeType.getType(),
-        generateThumbnail(videoFile.getInputStream())
-    );
-
-    videoRepository.create(video);
-
-    return video;
-  }
 
   // TODO: cache this with an expire time that's the same as the signature duration
   //       then just return the cached url (indexed by path) if it's still valid
-  private URL generatePresignedUrl(String path) {
+  private URL generatePresignedGetUrl(String path) {
     return s3Presigner.presignGetObject(
         GetObjectPresignRequest.builder()
-                               .signatureDuration(
-                                   awsConfig.signatureDurationMinutes)
+                               .signatureDuration(awsConfig.signatureDurationMinutes)
                                .getObjectRequest(
                                    GetObjectRequest.builder()
                                                    .key(path)
-                                                   .bucket(
-                                                       awsConfig.videoBucket)
+                                                   .bucket(awsConfig.videoBucket)
                                                    .build())
                                .build()).url();
   }
