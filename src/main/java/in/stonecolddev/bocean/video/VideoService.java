@@ -98,8 +98,7 @@ public class VideoService {
     connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", mimeType);
     connection.setRequestMethod("PUT");
-    connection.setFixedLengthStreamingMode(
-        data.available()); // I have no clue if calling available() is a good idea here
+    connection.setFixedLengthStreamingMode(data.available()); // I have no clue if calling available() is a good idea here
 
     OutputStream out = new BufferedOutputStream(connection.getOutputStream());
     data.transferTo(out);
