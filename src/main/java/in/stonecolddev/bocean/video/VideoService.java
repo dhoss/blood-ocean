@@ -87,6 +87,7 @@ public class VideoService {
     uploadFile(
         video.thumbnail(),
         mediaConfig.thumbnailMimeType.getType(),
+        // TODO: this should be an async call
         generateThumbnail(videoFile.getInputStream())
     );
 
@@ -126,7 +127,6 @@ public class VideoService {
     connection.disconnect();
   }
 
-  // TODO: this should be an async call
   private InputStream generateThumbnail(InputStream video) throws IOException, JCodecException {
     log.info(
         "Generating thumbnail for video {} bytes available",
