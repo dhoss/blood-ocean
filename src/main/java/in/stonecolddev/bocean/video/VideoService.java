@@ -102,6 +102,7 @@ public class VideoService {
     log.info("Uploading file {} {} {} bytes available", key, mimeType, data.available());
 
     // TODO: consider multipart uploads
+    // TODO: abstract http connection out
     HttpURLConnection connection =
         (HttpURLConnection) s3Presigner.presignPutObject(
                                            PutObjectPresignRequest.builder()
